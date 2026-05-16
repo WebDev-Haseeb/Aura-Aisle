@@ -1,7 +1,16 @@
-import { createHandler } from '../dist/server/server.js';
-
 export default async function handler(req, res) {
   try {
+    console.log('Function invoked:', req.method, req.url);
+    
+    // Import the server handler dynamically
+    const serverModule = await import('../dist/server/server.js');
+    const createHandler = serverModule.createHandler || serverModule.default;
+    
+    if (!createHandler || typeof createHandler !== 'function') {
+      console.error('Handler not found or not a function');
+      return res.status(500).send('Handler not available');
+    }
+    
     // Create a Web API Request from Node.js req
     const url = `https://${req.headers.host}${req.url}`;
     const body = req.method !== 'GET' && req.method !== 'HEAD' 
@@ -14,9 +23,12 @@ export default async function handler(req, res) {
       body,
     });
     
+    console.log('Calling handler...');
     // Get the TanStack Start handler
     const handler = await createHandler();
     const response = await handler(webRequest);
+    
+    console.log('Handler responded with status:', response.status);
     
     // Convert Web API Response to Node.js response
     res.status(response.status);
@@ -44,6 +56,11 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('Vercel server function error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Internal Server Error',
+      message: error.message,
+      stack: error.stack 
+    });
   }
 }
