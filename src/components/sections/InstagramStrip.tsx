@@ -14,7 +14,7 @@ export function InstagramStrip() {
         </FadeUp>
         <FadeUp delay={0.05}>
           <a
-            href="https://instagram.com"
+            href="https://instagram.com/auraandaisle"
             target="_blank"
             rel="noreferrer"
             className="font-mono text-[10px] uppercase tracking-[0.3em] hover:text-champagne ease-cinematic transition-colors duration-500"

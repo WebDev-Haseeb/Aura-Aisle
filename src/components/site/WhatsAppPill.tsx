@@ -1,7 +1,7 @@
 export function WhatsAppPill() {
   return (
     <a
-      href="https://wa.me/923000000000"
+      href="https://wa.me/923334445555"
       target="_blank"
       rel="noreferrer"
       className="fixed bottom-6 right-6 z-50 group flex items-center gap-2.5 h-10 pl-3.5 pr-5 rounded-full bg-charcoal text-ivory shadow-[0_8px_30px_rgba(0,0,0,0.12)] ring-1 ring-foreground/10 ease-cinematic transition-all duration-500 hover:scale-105 hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)]"

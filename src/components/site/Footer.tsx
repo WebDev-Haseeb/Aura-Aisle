@@ -24,8 +24,9 @@ export function Footer() {
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Connect</p>
           <ul className="space-y-2 text-sm">
             <li><a href="mailto:hello@auraandaisle.studio" className="hover:text-champagne ease-cinematic transition-colors duration-500">hello@auraandaisle.studio</a></li>
-            <li><a href="https://instagram.com" className="hover:text-champagne ease-cinematic transition-colors duration-500" rel="noreferrer">Instagram</a></li>
-            <li><a href="https://wa.me/923000000000" className="hover:text-champagne ease-cinematic transition-colors duration-500">WhatsApp · +92</a></li>
+            <li><a href="https://instagram.com/auraandaisle" className="hover:text-champagne ease-cinematic transition-colors duration-500" rel="noreferrer">Instagram · @auraandaisle</a></li>
+            <li><a href="https://wa.me/923334445555" className="hover:text-champagne ease-cinematic transition-colors duration-500">WhatsApp · +92 333 444 5555</a></li>
+            <li><a href="https://facebook.com/auraandaisle" className="hover:text-champagne ease-cinematic transition-colors duration-500" rel="noreferrer">Facebook · @auraandaisle</a></li>
           </ul>
         </div>
       </div>

@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { FadeUp } from "@/components/motion/FadeUp";
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView } from "motion/react";
 
 const steps = [
   { i: "01", title: "Discovery", body: "An unhurried conversation. We listen for the quiet preferences that shape the entire evening." },
@@ -9,41 +9,56 @@ const steps = [
   { i: "05", title: "Execution", body: "On the day, our team carries the entire weight so you remain wholly inside the moment." },
 ];
 
-export function Process() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showHint, setShowHint] = useState(true);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+const CARD_WIDTH_PERCENT = 100 / 3;
+const VISIBLE_COUNT = 3;
 
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 10);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
-    if (el.scrollLeft > 20) setShowHint(false);
-  }, []);
+export function Process() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [showHint, setShowHint] = useState(true);
+  const desktopRef = useRef<HTMLDivElement>(null);
+  const mobileRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(desktopRef, { once: true, margin: "-10%" });
+
+  const maxIndex = steps.length - VISIBLE_COUNT;
+  const canGoLeft = activeIndex > 0;
+  const canGoRight = activeIndex < maxIndex;
 
   useEffect(() => {
-    const el = scrollRef.current;
+    const el = mobileRef.current;
     if (!el) return;
-    checkScroll();
-    el.addEventListener("scroll", checkScroll, { passive: true });
-    return () => el.removeEventListener("scroll", checkScroll);
-  }, [checkScroll]);
+    const onScroll = () => {
+      if (el.scrollLeft > 20) setShowHint(false);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
 
-  function scrollBy(direction: number) {
-    const el = scrollRef.current;
-    if (!el) return;
-    const card = el.querySelector("article") as HTMLElement | null;
-    const gap = window.innerWidth >= 768 ? 64 : 32;
-    const amount = card ? card.offsetWidth + gap : (window.innerWidth >= 768 ? 400 : 300);
-    el.scrollBy({ left: direction * amount, behavior: "smooth" });
-  }
+  const cardContent = (s: typeof steps[number], idx: number, isDesktop: boolean) => (
+    <article className="space-y-8 pr-6 md:pr-8 md:border-r md:border-ivory/10 last:md:border-r-0 h-full">
+      <div className="flex items-baseline gap-4">
+        <span className="font-display italic text-7xl md:text-8xl text-champagne/40 leading-none">
+          {s.i}
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ivory/50">
+          Stage
+        </span>
+      </div>
+      <h4 className="font-display text-3xl italic">{s.title}</h4>
+      <p className="text-sm leading-relaxed text-ivory/70 text-pretty">
+        {s.body}
+      </p>
+    </article>
+  );
 
   return (
-    <section className="bg-charcoal text-ivory py-32 md:py-48 overflow-hidden">
+    <section className="bg-charcoal text-ivory py-32 md:py-48">
       <div className="px-6 md:px-12 max-w-7xl mx-auto">
-        <FadeUp>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ duration: 1.2, ease: [0.32, 0, 0.2, 1] }}
+        >
           <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-ivory/40 mb-6">
             The sequence
           </p>
@@ -52,14 +67,15 @@ export function Process() {
             <br />
             <span className="italic">into a vision.</span>
           </h2>
-        </FadeUp>
+        </motion.div>
       </div>
 
-      <div className="relative mt-20 md:mt-28 max-w-7xl mx-auto">
+      {/* Desktop carousel */}
+      <div className="hidden md:block relative mt-20 md:mt-28 max-w-7xl mx-auto px-12">
         <button
-          onClick={() => scrollBy(-1)}
+          onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
           aria-label="Previous stage"
-          className={`hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`absolute left-5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canGoLeft ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -67,38 +83,56 @@ export function Process() {
         </button>
 
         <button
-          onClick={() => scrollBy(1)}
+          onClick={() => setActiveIndex((i) => Math.min(maxIndex, i + 1))}
           aria-label="Next stage"
-          className={`hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`absolute right-5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canGoRight ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
-        <div ref={scrollRef} className="flex overflow-x-auto snap-x snap-mandatory gap-8 md:gap-16 px-6 md:px-12 pb-12 no-scrollbar scroll-smooth">
-          {steps.map((s, idx) => (
-            <FadeUp key={s.i} delay={idx * 0.06} as="div">
-              <article className="snap-start min-w-[280px] md:min-w-0 md:basis-[calc((100%-128px)/3)] md:shrink-0 space-y-8 pr-8 border-r border-ivory/10 last:border-r-0">
-                <div className="flex items-baseline gap-4">
-                  <span className="font-display italic text-7xl md:text-8xl text-champagne/40 leading-none">
-                    {s.i}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ivory/50">
-                    Stage
-                  </span>
-                </div>
-                <h4 className="font-display text-3xl italic">{s.title}</h4>
-                <p className="text-sm leading-relaxed text-ivory/70 text-pretty">
-                  {s.body}
-                </p>
-              </article>
-            </FadeUp>
-          ))}
+        <div ref={desktopRef} className="overflow-hidden mx-6">
+          <motion.div
+            className="flex"
+            animate={{ x: `-${activeIndex * CARD_WIDTH_PERCENT}%` }}
+            transition={{ duration: 0.7, ease: [0.32, 0, 0.2, 1] }}
+          >
+            {steps.map((s, idx) => (
+              <motion.div
+                key={s.i}
+                className="w-1/3 flex-shrink-0 px-6"
+                initial={{ opacity: 0, y: 24 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+                transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.32, 0, 0.2, 1] }}
+              >
+                {cardContent(s, idx, true)}
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </div>
 
-      <div className={`px-6 md:px-12 max-w-7xl mx-auto flex justify-end transition-opacity duration-700 ${showHint ? "opacity-100" : "opacity-0"}`}>
+      {/* Mobile scrollable */}
+      <div
+        ref={mobileRef}
+        className="md:hidden flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 pb-10 no-scrollbar scroll-smooth mt-16"
+      >
+        {steps.map((s, idx) => (
+          <motion.div
+            key={s.i}
+            className="snap-start min-w-[260px] flex-shrink-0"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.32, 0, 0.2, 1] }}
+          >
+            {cardContent(s, idx, false)}
+          </motion.div>
+        ))}
+      </div>
+
+      <div className={`px-6 md:px-12 max-w-7xl mx-auto flex justify-end transition-opacity duration-700 md:hidden ${showHint ? "opacity-100" : "opacity-0"}`}>
         <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ivory/40 flex items-center gap-2">
           Drag to explore
           <svg className="size-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
