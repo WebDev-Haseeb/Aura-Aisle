@@ -5,7 +5,7 @@ type Props = {
   children: ReactNode;
   delay?: number;
   className?: string;
-  as?: "div" | "span" | "p" | "h1" | "h2" | "h3" | "h4";
+  as?: "div" | "span"  | "p" | "h1" | "h2" | "h3" | "h4";
 };
 
 export function FadeUp({ children, delay = 0, className, as = "div" }: Props) {
