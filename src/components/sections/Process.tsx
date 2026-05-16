@@ -34,8 +34,10 @@ export function Process() {
   function scrollBy(direction: number) {
     const el = scrollRef.current;
     if (!el) return;
-    const cardWidth = window.innerWidth >= 768 ? 360 + 64 : 280 + 32;
-    el.scrollBy({ left: direction * cardWidth, behavior: "smooth" });
+    const card = el.querySelector("article") as HTMLElement | null;
+    const gap = window.innerWidth >= 768 ? 64 : 32;
+    const amount = card ? card.offsetWidth + gap : (window.innerWidth >= 768 ? 400 : 300);
+    el.scrollBy({ left: direction * amount, behavior: "smooth" });
   }
 
   return (
@@ -53,11 +55,11 @@ export function Process() {
         </FadeUp>
       </div>
 
-      <div className="relative mt-20 md:mt-28">
+      <div className="relative mt-20 md:mt-28 max-w-7xl mx-auto">
         <button
           onClick={() => scrollBy(-1)}
           aria-label="Previous stage"
-          className={`hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -67,7 +69,7 @@ export function Process() {
         <button
           onClick={() => scrollBy(1)}
           aria-label="Next stage"
-          className={`hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-ivory/10 backdrop-blur-md ring-1 ring-ivory/20 text-ivory hover:bg-ivory/20 ease-cinematic transition-all duration-500 ${canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -77,7 +79,7 @@ export function Process() {
         <div ref={scrollRef} className="flex overflow-x-auto snap-x snap-mandatory gap-8 md:gap-16 px-6 md:px-12 pb-12 no-scrollbar scroll-smooth">
           {steps.map((s, idx) => (
             <FadeUp key={s.i} delay={idx * 0.06} as="div">
-              <article className={`snap-start min-w-[280px] md:min-w-[360px] max-w-[360px] space-y-8 pr-8 border-r border-ivory/10 last:border-r-0 pl-4 md:pl-8 ${idx === 0 ? "ml-2 md:ml-4" : ""}`}>
+              <article className="snap-start min-w-[280px] md:min-w-0 md:basis-[calc((100%-128px)/3)] md:shrink-0 space-y-8 pr-8 border-r border-ivory/10 last:border-r-0">
                 <div className="flex items-baseline gap-4">
                   <span className="font-display italic text-7xl md:text-8xl text-champagne/40 leading-none">
                     {s.i}

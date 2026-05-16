@@ -17,13 +17,13 @@ export const Route = createFileRoute("/inquiry")({
 });
 
 const fields = [
-  { name: "name", label: "Your name", type: "text", required: true, full: false },
-  { name: "partner", label: "Partner's name (optional)", type: "text", required: false, full: false },
-  { name: "email", label: "Email", type: "email", required: true, full: false },
-  { name: "phone", label: "Phone / WhatsApp", type: "tel", required: false, full: false },
+  { name: "name", label: "Your name", type: "text", required: true, full: false, autoComplete: "name" },
+  { name: "partner", label: "Partner's name (optional)", type: "text", required: false, full: false, autoComplete: "name" },
+  { name: "email", label: "Email", type: "email", required: true, full: false, autoComplete: "email" },
+  { name: "phone", label: "Phone / WhatsApp", type: "tel", required: false, full: false, autoComplete: "tel" },
   { name: "eventType", label: "Event type", type: "text", required: true, full: false, placeholder: "Wedding, intimate ceremony, private celebration…" },
   { name: "date", label: "Anticipated date", type: "text", required: false, full: false, placeholder: "Month, year" },
-  { name: "location", label: "Preferred location", type: "text", required: false, full: false },
+  { name: "location", label: "Preferred location", type: "text", required: false, full: false, autoComplete: "address-level1" },
   { name: "guests", label: "Approximate guests", type: "text", required: false, full: false },
   { name: "budget", label: "Budget range", type: "text", required: false, full: true },
 ];
@@ -93,10 +93,12 @@ function InquiryPage() {
                     {f.label}{f.required ? " *" : ""}
                   </span>
                   <input
+                    id={f.name}
                     name={f.name}
                     type={f.type}
                     required={f.required}
                     placeholder={f.placeholder}
+                    autoComplete={f.autoComplete}
                     className="w-full bg-transparent border-b border-foreground/20 pb-3 text-base placeholder:text-muted-foreground/50 focus:outline-none focus:border-champagne ease-cinematic transition-colors duration-500"
                   />
                 </label>
@@ -106,6 +108,7 @@ function InquiryPage() {
                   Your vision *
                 </span>
                 <textarea
+                  id="vision"
                   name="vision"
                   required
                   rows={5}
