@@ -4,7 +4,13 @@ export default async function handler(req, res) {
     
     // Import the server handler dynamically
     const serverModule = await import('../dist/server/server.js');
-    const createHandler = serverModule.createHandler || serverModule.default;
+    console.log('Server module exports:', Object.keys(serverModule));
+    
+    // Try different possible exports
+    const createHandler = serverModule.createHandler || 
+                         serverModule.createRequestHandler ||
+                         serverModule.default ||
+                         serverModule;
     
     if (!createHandler || typeof createHandler !== 'function') {
       console.error('Handler not found or not a function');
