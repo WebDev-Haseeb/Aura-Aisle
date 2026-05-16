@@ -5,7 +5,12 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/api"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "dist/server/**"
+    }
+  }
 }

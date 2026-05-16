@@ -12,7 +12,4 @@ export default defineConfig({
       target: "esnext",
     },
   },
-  tanstackStart: {
-    ssr: false, // Disable SSR for static build
-  },
 });
