@@ -14,27 +14,15 @@ const VISIBLE_COUNT = 3;
 
 export function Process() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showHint, setShowHint] = useState(true);
   const desktopRef = useRef<HTMLDivElement>(null);
-  const mobileRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(desktopRef, { once: true, margin: "-10%" });
 
   const maxIndex = steps.length - VISIBLE_COUNT;
   const canGoLeft = activeIndex > 0;
   const canGoRight = activeIndex < maxIndex;
 
-  useEffect(() => {
-    const el = mobileRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      if (el.scrollLeft > 20) setShowHint(false);
-    };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
-  }, []);
-
   const cardContent = (s: typeof steps[number], idx: number, isDesktop: boolean) => (
-    <article className="space-y-8 pr-6 md:pr-8 md:border-r md:border-ivory/10 last:md:border-r-0 h-full">
+    <article className="space-y-8 pr-0 md:pr-8 md:border-r md:border-ivory/10 last:md:border-r-0 h-full">
       <div className="flex items-baseline gap-4">
         <span className="font-display italic text-7xl md:text-8xl text-champagne/40 leading-none">
           {s.i}
@@ -113,32 +101,21 @@ export function Process() {
         </div>
       </div>
 
-      {/* Mobile scrollable */}
-      <div
-        ref={mobileRef}
-        className="md:hidden flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 pb-10 no-scrollbar scroll-smooth mt-16"
-      >
+      {/* Mobile vertical stack */}
+      <div className="md:hidden px-6 mt-16 space-y-12">
         {steps.map((s, idx) => (
           <motion.div
             key={s.i}
-            className="snap-start min-w-[260px] flex-shrink-0"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-10%" }}
             transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.32, 0, 0.2, 1] }}
           >
-            {cardContent(s, idx, false)}
+            <div className="border-l border-ivory/20 pl-6">
+              {cardContent(s, idx, false)}
+            </div>
           </motion.div>
         ))}
-      </div>
-
-      <div className={`px-6 md:px-12 max-w-7xl mx-auto flex justify-end transition-opacity duration-700 md:hidden ${showHint ? "opacity-100" : "opacity-0"}`}>
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ivory/40 flex items-center gap-2">
-          Drag to explore
-          <svg className="size-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-          </svg>
-        </span>
       </div>
     </section>
   );
